@@ -5,10 +5,12 @@ const PORT = process.env.PORT
 
 // Import the exported auth.js router object
 const authRoute = require("./controllers/auth")
+const todoRoute = require("./controllers/todos")
 
 // Middleware which allows us to point to where the route is
 app.use(express.json())
 app.use(authRoute)
+app.use(todoRoute)
 
 /* 
     ? Model View Controller (MVC)
