@@ -5,7 +5,6 @@ const PORT = process.env.PORT
 
 // Import the exported auth.js router object
 const authRoute = require("./controllers/auth")
-console.log(authRoute)
 
 // Middleware which allows us to point to where the route is
 app.use(express.json())

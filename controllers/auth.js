@@ -1,10 +1,11 @@
 // Imports Express Router
-const router = require("express").Router()
+const router = require("express").Router();
 
-const fs = require("fs")
-const dbPath = "./models/users.json"
-const { save, read } = require("../helpers/rw.js")
-
+const fs = require("fs");
+const dbPath = "./models/users.json";
+const logFilePath = "./logs/authLogs.json"
+const logError = require("../services/logErrorService.js")
+const { save, read } = require("../helpers/rw.js");
 
 /* 
     ? CHALLENGE
@@ -17,33 +18,32 @@ const { save, read } = require("../helpers/rw.js")
     * import them into auth.js so they can continue to be used
 */
 
-
 router.post("/register", (req, res) => {
-    const { fullName, email, password } = req.body
-    console.log(fullName, email, password)
+	const { fullName, email, password } = req.body;
+	console.log(fullName, email, password);
 
-    let userDB = read(dbPath)
-    
-    let foundUser = userDB.filter(usr => usr.email === email)
+	let userDB = read(dbPath);
 
-    if (foundUser.length) {
-        res.status(409).json({
-            message: "User already exists"
-        })
-    } else {
-        userDB.push({
-            fullName: fullName,
-            email: email,
-            password: password
-        })
-        
-        save(userDB, dbPath)
-    }
+	let foundUser = userDB.filter(usr => usr.email === email);
 
-    res.status(200).json({
-        message: "Here's our response"
-    })
-})
+	if (foundUser.length) {
+		res.status(409).json({
+			message: "User already exists",
+		});
+	} else {
+		userDB.push({
+			fullName: fullName,
+			email: email,
+			password: password,
+		});
+
+		save(userDB, dbPath);
+	}
+
+	res.status(200).json({
+		message: "Here's our response",
+	});
+});
 
 /* 
     ? Take Home Challenge
@@ -62,5 +62,83 @@ router.post("/register", (req, res) => {
     * make sure you greet logged in user by their email
 */
 
+router.post("/login", (req, res) => {
+	// const { email, password } = req.body
+	// const userDB = read(dbPath)
+	// const foundUser = userDB.filter(usr => usr.email === email)
+
+	// if (foundUser.length) {
+	//     if (foundUser[0].password === password) {
+	//         res.status(200).json({
+	//             message: `Logged in as ${email}`
+	//         })
+	//     } else {
+	//         res.status(403).json({
+	//             message: "Forbidden"
+	//         })
+	//     }
+	// } else {
+	//     res.status(404).json({
+	//         message: "User not found"
+	//     })
+	// }
+
+	// Early Return Example
+
+	// if (!foundUser.length) {
+	//     res.status(404).json({
+	//         message: "User not found"
+	//     })
+	//     return
+	// }
+
+	// if (foundUser[0].password !== password) {
+	//     res.status(403).json({
+	//         message: "Forbidden"
+	//     })
+	//     return
+	// }
+
+	// res.status(200).json({
+	//     message: `${email} logged in`
+	// })
+
+    // Guard Clauses
+
+    /* 
+        ? Challenge
+        * build me a function called logError
+        * it will take an error
+        * it will append said error to an error file
+        ! SPICEY MODE ensure that the error is preceeded with a time stamp
+        TODO: HINT use a pattern we've used for retrieving and saving users from our database
+    */
+
+    
+	try {
+		const { email, password } = req.body;
+		const userDB = read(dbPath);
+		const foundUser = userDB.filter(usr => usr.email === email);
+
+		if (!foundUser.length) {
+			throw new Error("User not found")
+		}
+
+		if (foundUser[0].password !== password) {
+			throw new Error("Forbidden")
+		}
+
+		res.status(200).json({
+			message: `${email} logged in`,
+		});
+
+	} catch (err) {
+        logError(err, logFilePath)
+        res.status(500).json({
+            message: `${err.message}`
+        })
+    }
+});
+
 // Exports our router object into the Module
-module.exports = router
+module.exports = router;
