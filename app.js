@@ -1,6 +1,8 @@
 require("dotenv").config()
 const express = require("express")
 const app = express()
+// Import our database function I created
+const { dbConnect } = require("./db")
 const PORT = process.env.PORT
 
 // Import the exported auth.js router object
@@ -23,5 +25,7 @@ app.use(todoRoute)
 */
 
 app.listen(PORT, () => {
+    // Invoke your database function
+    dbConnect()
     console.log(`[server] listening on ${PORT}`)
 })
