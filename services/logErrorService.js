@@ -1,10 +1,12 @@
-const { read, save } = require("../helpers/rw")
+const Log = require("../models/Log")
 
-const logError = (err, path) => {
-    let currentDateTime = new Date()
-    let errFile = read(path)
-    errFile.push(`${currentDateTime} - ${err.message}`)
-    save(errFile, path)
+const logError = (err) => {
+    const { name, message } = err
+    const newErr = new Log({
+        errorName: name,
+        errorMessage: message
+    })
+    newErr.save()
 }
 
 module.exports = logError

@@ -1,21 +1,12 @@
 const router = require("express").Router()
-const { read, save } = require("../helpers/rw")
 const logError = require("../services/logErrorService")
-const todoData = "./models/todos.json"
-const todoLogs = "./logs/todoLogs.json"
 
 router.get("/", (req, res) => {
     try {
-        const db = read(todoData)
-
-        if (!db.length) {
-            throw new Error(`No data`)
-        }
-        
-        res.status(200).json(db)
+        // TODO" create business logic to retrieve all todo's once you've completed POST logic and added a few
         
     } catch(err) {
-        logError(err, todoLogs)
+        logError(err)
         res.status(500).json({
             error: `${err}`
         })
@@ -25,18 +16,11 @@ router.get("/", (req, res) => {
 router.get("/:searchValue", (req, res) => {
     try {
         const { searchValue } = req.params
-        const db = read(todoData)
-        
-        const foundItem = db.filter(i => i.title === searchValue)
-        
-        if (!foundItem.length) {
-            throw new Error(`No matches found`)
-        }
 
-        res.status(200).json(foundItem)
+        // TODO: spicey mode: try to build a logic where you pass searchValue as a query to your database to find specific todo item
         
     } catch(err) {
-        logError(err, todoLogs)
+        logError(err)
         res.status(500).json({
             error: `${err}`
         })
@@ -47,28 +31,10 @@ router.post("/add", (req, res) => {
     try {
         const { title, urgency } = req.body
 
-        if (!title || !urgency) {
-            throw new Error(`please provide title and urgency`)
-        }
-
-        const IUrgency = ["low", "medium", "high"]
-
-        if (!IUrgency.includes(urgency)) {
-            throw new Error(`urgency options available ${IUrgency}`)
-        }
-
-        const db = read(todoData)
-
-        db.push({ title, urgency})
-
-        save(db, todoData)
-
-        res.status(200).json({
-            message: `${title} added`
-        })
+        // TODO: create Todo model, and build logic to add todo to your collection
 
     } catch(err) {
-        logError(err, todoLogs)
+        logError(err)
         res.status(500).json({
             error: `${err}`
         })
