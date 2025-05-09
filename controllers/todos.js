@@ -16,11 +16,11 @@ router.get("/", async (req, res) => {
     }
 })
 
-router.get("/:searchValue", async (req, res) => {
+router.get("/:user", async (req, res) => {
     try {
-        const { searchValue } = req.params
+        const { user } = req.params
         
-        const found = await Todo.find({ title: searchValue })
+        const found = await Todo.find({ user })
         // ! Tip: if empty, find returns []; findOne returns null
         
         if (!found.length) throw new Error(`Nothing matching this query`)
@@ -40,7 +40,7 @@ router.post("/add", async (req, res) => {
     try {
         const { title, urgency } = req.body
 
-        const newEntry = new Todo({ title, urgency })
+        const newEntry = new Todo({ title, urgency, user: req.user })
         await newEntry.save()
 
         res.status(201).json({

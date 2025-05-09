@@ -8,7 +8,9 @@ const User = require("../models/User.js");
 // Set your salt value inside .env file and import it here
 // wrap it into Number() to convert from string
 const SALT = Number(process.env.SALT);
-console.log(SALT)
+// Import your jsonwebtoken dependency
+const jwt = require("jsonwebtoken")
+const JWT_KEY = process.env.JWT_KEY
 
 router.post("/register", async (req, res) => {
 	try {
@@ -26,9 +28,21 @@ router.post("/register", async (req, res) => {
 		// Save the model document into the collection
 		await newUser.save();
 
+		// ? Generate our JWT
+		const token = jwt.sign(
+			// payload
+			{ _id: newUser._id },
+			// secret key
+			JWT_KEY,
+			// options for our token
+			{ expiresIn: "24h" }
+		)
+		console.log(token)
+
 		res.status(201).json({
 			message: `User created`,
 			newUser,
+			token
 		});
 	} catch (err) {
 		console.log(err);
@@ -69,8 +83,20 @@ router.post("/login", async (req, res) => {
 		
 		if (!verifiedPwd) throw Error(`invalid password`);
 
-		res.status(200).json({ message: `${email} logged in` });
+		// ? Generate our JWT
+		const token = jwt.sign(
+			// payload
+			{ _id: foundUser[0]._id },
+			// secret key
+			JWT_KEY,
+			// options for our token
+			{ expiresIn: "24h" }
+		)
+		console.log(token)
+
+		res.status(200).json({ message: `${email} logged in`, token });
 	} catch (err) {
+		console.log(err)
 		logError(err);
 		res.status(500).json({
 			message: `${err.message}`,

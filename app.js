@@ -8,11 +8,15 @@ const PORT = process.env.PORT
 // Import the exported auth.js router object
 const authRoute = require("./controllers/auth")
 const todoRoute = require("./controllers/todos")
+const sessionValidation = require("./middlewares/session")
 
 // Middleware which allows us to point to where the route is
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(authRoute)
-app.use(todoRoute)
+// request will go thru sessionValidation before going to todoRoute
+app.use(sessionValidation, todoRoute)
+
 
 /* 
     ? Model View Controller (MVC)

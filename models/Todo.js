@@ -2,6 +2,10 @@ const { mongoose } = require("../db")
 
 const Todo = new mongoose.Schema(
     {
+        user: {
+            type: Object,
+            required: true
+        },
         title: {
             type: String,
             required: true
